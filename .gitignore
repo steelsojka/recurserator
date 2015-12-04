@@ -28,3 +28,4 @@ node_modules
 
 *.js
 !lib/*.js
+!lib/utils/*.js
