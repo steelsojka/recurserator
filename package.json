@@ -14,7 +14,6 @@
   "license": "MIT",
   "dependencies": {
     "lodash.callback": "^3.3.1",
-    "lodash.get": "^3.7.0",
     "lodash.isfunction": "^3.0.6",
     "lodash.isobject": "^3.0.2",
     "lodash.isplainobject": "^3.2.0",
