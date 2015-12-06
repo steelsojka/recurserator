@@ -29,3 +29,6 @@ node_modules
 *.js
 !lib/*.js
 !lib/utils/*.js
+!test/*.js
+!test/utils/*.js
+!scripts/*
