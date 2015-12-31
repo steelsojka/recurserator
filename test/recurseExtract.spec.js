@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import recurse from '../lib/recurseExtract';
+import recurseExtract from '../lib/recurseExtract';
 
 describe('recurseExtract', () => {
   let data, results;
