@@ -11,9 +11,17 @@ Install
 Usage
 -----
 
-Recurserator does not have a single default export. Instead you can import the generator you need.
+The default export is the `recurseTree` generator.
 
-`import recurse from 'recurserator/recurse'`
+`import recurse from 'recurserator';`
+
+You can also use named imports.
+
+`import { recurseTree, recurseExtract } from 'recurserator';`
+
+Or you can import the generator you want.
+
+`import recurseTree from 'recurserator/recurseTree';`
 
 API
 ---
