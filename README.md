@@ -3,6 +3,8 @@ Recurserator
 
 Recurserator is a set of **recurs**ive gen**erator**s for recursively accessing an object.
 
+[![npm version](https://badge.fury.io/js/recurserator.svg)](https://badge.fury.io/js/recurserator)
+
 Install
 -------
 
