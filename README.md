@@ -10,6 +10,7 @@ Install
 
 `npm install --save recurserator`
 
+
 Usage
 -----
 
@@ -24,6 +25,13 @@ You can also use named imports.
 Or you can import the generator you want.
 
 `import recurseTree from 'recurserator/recurseTree';`
+
+Recurserator requires an ES2015 environment to work. It will not set one up for you! The current version
+will require the [Babel Polyfill](https://babeljs.io/docs/usage/polyfill/) for the [Regenerator Runtime](https://github.com/facebook/regenerator).
+
+If you are running in an environment that natively supports generators then you can import modules from the `native` module.
+
+`import recurseTree from 'recurserator/native/recurseTree';`
 
 API
 ---

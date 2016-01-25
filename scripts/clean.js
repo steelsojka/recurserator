@@ -1,3 +1,3 @@
-import del from 'del';
+import { rm } from 'shelljs';
 
-del.sync(['*.js', 'utils/**/*.js']);
+rm('-rf', './*.js', './utils', './native');
