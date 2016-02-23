@@ -14,9 +14,9 @@ Install
 Usage
 -----
 
-The default export is the `recurseTree` generator.
+The default export is the `RecursionBuilder` class.
 
-`import recurse from 'recurserator';`
+`import RecursionBuilder from 'recurserator';`
 
 You can also use named imports.
 
@@ -35,23 +35,23 @@ If you are running in an environment that natively supports generators then you 
 
 API
 ---
-<a name="recurseTree"></a>
-## recurseTree(object, yieldFilter, traverseFilter, entryExtractor) ⇒ <code>Iterator</code>
-Recursively accesses all keys of an object and sub objects. What values are yielded and what values are accessed
-can be determined by the two seperate filter arguments. This allows for lots of different compositions. The yielded
-value is an array of with these values `[key, value, path, parent]`.
+<a name="RecursionBuilder"></a>
+## RecursionBuilder(object, options) ⇒ <code>RecursionBuilder</code>
+The RecursionBuilder builds a recursive alogorithm and iterates using that algorithm. Arguments are optional and can be supplied through a building pattern.
+A RecursionBuilder instance itself is an iterable. RecursionBuilder objects are also immutable.
  
-| Param          | Type                  | Description                                                                                                                     |                                                          
-| -------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| object         | <code>Object</code>   | The object to recursively access                                                                                                |
-| yieldFilter    | <code>Function</code> | A function that determines whether a value is yielded                                                                           |
-| traverseFilter | <code>Function</code> | A function that determines whether a value is accessed with recursion                                                           |
-| entryExtractor | <code>Function</code> | A function that extracts the key/value pair from an object. Defaults to the `entries` method or own enumerable keys for objects |
+| Param                  | Type                  | Description                                                                                                                     |                                                          
+| ---------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| object                 | <code>Object</code>   | The object to recursively access                                                                                                |
+| options.yieldFilter    | <code>Function</code> | A function that determines whether a value is yielded                                                                           |
+| options.traverseFilter | <code>Function</code> | A function that determines whether a value is accessed with recursion                                                           |
+| options.entryExtractor | <code>Function</code> | A function that extracts the key/value pair from an object. Defaults to the `entries` method or own enumerable keys for objects |
+| options.childExtractor | <code>Function</code> | A function that extracts the next item to iterate over                                                                          |
 
 ### Example
 
 ```javascript
-import recurseTree from 'recurserator/recurseTree';
+import RecursionBuilder from 'recurserator';
 
 const data = {
   value1: 10,
@@ -64,7 +64,9 @@ const data = {
   }
 };
 
-for (let [key, value, path, parent] of recurseTree(data)) {
+const bulder = RecursionBuilder.create(data);
+
+for (let [key, value, path, parent] of builder) {
   //=> ['value1', 10, 'value1', data]
   //=> ['aList', [...], 'aList', data]
   //=> ['0', {...}, 'aList[0]', data.aList]
@@ -78,7 +80,7 @@ for (let [key, value, path, parent] of recurseTree(data)) {
 const truth = () => true;
 const notArray = item => !Array.isArray(item);
 
-for (let [key, value, path, parent] of recurseTree(data, truth, notArray) {
+for (let [key, value, path, parent] of builder.yield(truth).traverse(notArray)) {
   //=> ['value1', 10, 'value1', data]
   //=> ['aList', [...], 'aList', data]
   //=> ['nested', {...}, 'nested', data]
@@ -87,7 +89,7 @@ for (let [key, value, path, parent] of recurseTree(data, truth, notArray) {
 
 // Only yield objects
 
-for (let [key, value, path, parent] of recurseTree(data, isObject) {
+for (let [key, value, path, parent] of builder.yield(isObject)) {
   //=> ['aList', [...], 'aList', data]
   //=> ['0', {...}, 'aList[0]', data.aList]
   //=> ['nested', {...}, 'nested', data]
@@ -95,107 +97,122 @@ for (let [key, value, path, parent] of recurseTree(data, isObject) {
 }
 ```
 
-<a name="recurseTree.keys"></a>
-## recurseTree.keys(object, yieldFilter, traverseFilter, entryExtractor) ⇒ <code>Iterator</code>
-Same arguments as `recurseTree`. Yields only the key value.
+<a name="RecursionBuilder.prototype.yield"></a>
+## RecursionBuilder.prototype.yield(yieldFilter) ⇒ <code>RecursionBuilder</code>
+Sets the yield filter property. This condition is called to test whether a value should be yielded.
+Returns a new RecursionBuilder instance.
+ 
+| Param          | Type                  | Description                                           |                                                          
+| -------------- | --------------------- | ----------------------------------------------------- |
+| yieldFilter    | <code>Function</code> | A function that determines whether a value is yielded |
+
+<a name="RecursionBuilder.prototype.traverse"></a>
+## RecursionBuilder.prototype.traverse(traverseFilter) ⇒ <code>RecursionBuilder</code>
+Sets the traverse filter property. This condition is called to test whether a value should be traversed.
+Returns a new RecursionBuilder instance.
+ 
+| Param          | Type                  | Description                                                           |                                                          
+| -------------- | --------------------- | --------------------------------------------------------------------- |
+| traverseFilter | <code>Function</code> | A function that determines whether a value is accessed with recursion |
+
+<a name="RecursionBuilder.prototype.extractor"></a>
+## RecursionBuilder.prototype.extractor(extractor) ⇒ <code>RecursionBuilder</code>
+Sets the extractor property. When this method is provided instead of traversing to the next key. This method will be called
+to determine what the child of the value should be.
+Returns a new RecursionBuilder instance.
+ 
+| Param     | Type                         | Description                                           |                                                          
+| --------- | ---------------------------- | ----------------------------------------------------- |
+| extractor | <code>Function|String</code> | A function that returns the next item to iterate over |
+
+<a name="RecursionBuilder.prototype.entries"></a>
+## RecursionBuilder.prototype.entries(extractor) ⇒ <code>RecursionBuilder</code>
+Sets the extractor property. Used to extract key/value pair from an object. Defaults to `entries` iterator if it exists.
+Returns a new RecursionBuilder instance.
  
 | Param          | Type                  | Description                                                                                                                     |                                                          
 | -------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| object         | <code>Object</code>   | The object to recursively access                                                                                                |
-| yieldFilter    | <code>Function</code> | A function that determines whether a value is yielded                                                                           |
-| traverseFilter | <code>Function</code> | A function that determines whether a value is accessed with recursion                                                           |
 | entryExtractor | <code>Function</code> | A function that extracts the key/value pair from an object. Defaults to the `entries` method or own enumerable keys for objects |
 
-### Example
-```javascript
-
-for (let key of recurseTree.keys(data)) {
-  //=> 'value1'
-  //=> 'aList'
-  //=> '0'
-  //=> 'listKey'
-  //=> 'nested'
-  //=> 'anotherNested'
-}
-```
-
-<a name="recurseTree.values"></a>
-## recurseTree.values(object, yieldFilter, traverseFilter, entryExtractor) ⇒ <code>Iterator</code>
-Same arguments as `recurseTree`. Yields only the value.
+<a name="RecursionBuilder.prototype.clone"></a>
+## RecursionBuilder.prototype.clone(newState = {}) ⇒ <code>RecursionBuilder</code>
+Clones the builder object merging in the new state.
  
-| Param          | Type                  | Description                                                                                                                     |                                                          
-| -------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| object         | <code>Object</code>   | The object to recursively access                                                                                                |
-| yieldFilter    | <code>Function</code> | A function that determines whether a value is yielded                                                                           |
-| traverseFilter | <code>Function</code> | A function that determines whether a value is accessed with recursion                                                           |
-| entryExtractor | <code>Function</code> | A function that extracts the key/value pair from an object. Defaults to the `entries` method or own enumerable keys for objects |
+| Param    | Type                | Description           |                                                          
+| -------- | ------------------- | --------------------- |
+| newState | <code>Object</code> | New state to merge in |
 
-### Example
-```javascript
-
-for (let value of recurseTree.values(data)) {
-  //=> 10
-  //=> [...]
-  //=> {...}
-  //=> 'Hi!'
-  //=> {...}
-  //=> {...}
-}
-```
-
-<a name="recurseTree.paths"></a>
-## recurseTree.paths(object, yieldFilter, traverseFilter, entryExtractor) ⇒ <code>Iterator</code>
-Same arguments as `recurseTree`. Yields only the path.
+<a name="RecursionBuilder.create"></a>
+## RecursionBuilder.create(object, options) ⇒ <code>RecursionBuilder</code>
+Creates a RecursionBuilder.
  
-| Param          | Type                  | Description                                                                                                                     |                                                          
-| -------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| object         | <code>Object</code>   | The object to recursively access                                                                                                |
-| yieldFilter    | <code>Function</code> | A function that determines whether a value is yielded                                                                           |
-| traverseFilter | <code>Function</code> | A function that determines whether a value is accessed with recursion                                                           |
-| entryExtractor | <code>Function</code> | A function that extracts the key/value pair from an object. Defaults to the `entries` method or own enumerable keys for objects |
+| Param                  | Type                  | Description                                                                                                                     |                                                          
+| ---------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| object                 | <code>Object</code>   | The object to recursively access                                                                                                |
+| options.yieldFilter    | <code>Function</code> | A function that determines whether a value is yielded                                                                           |
+| options.traverseFilter | <code>Function</code> | A function that determines whether a value is accessed with recursion                                                           |
+| options.entryExtractor | <code>Function</code> | A function that extracts the key/value pair from an object. Defaults to the `entries` method or own enumerable keys for objects |
+| options.childExtractor | <code>Function</code> | A function that extracts the next item to iterate over                                                                          |
 
-### Example
-```javascript
+<a name="RecursionBuilder.prototype.recurse"></a>
+## RecursionBuilder.prototype.recurse(object) ⇒ <code>Iterable</code>
+Runs the recursion algorithm on the provided data object.
+ 
+| Param                  | Type                  | Description                      |                                                          
+| ---------------------- | --------------------- | ---------------------------------|
+| object                 | <code>Object</code>   | The object to recursively access |
 
-for (let path of recurseTree.paths(data)) {
-  //=> 'value1'
-  //=> 'aList'
-  //=> 'aList[0]'
-  //=> 'aList[0].listKey'
-  //=> 'nested'
-  //=> 'nested.anotherNested'
-}
-```
+<a name="RecursionBuilder.prototype.keys"></a>
+## RecursionBuilder.prototype.key(object) ⇒ <code>Iterable</code>
+Runs the recursion algorithm on the provided data object. Yields only keys. If no object is provided the storage object in the builder will be used.
+ 
+| Param                  | Type                  | Description                      |                                                          
+| ---------------------- | --------------------- | ---------------------------------|
+| object                 | <code>Object</code>   | The object to recursively access |
+
+<a name="RecursionBuilder.prototype.values"></a>
+## RecursionBuilder.prototype.values(object) ⇒ <code>Iterable</code>
+Runs the recursion algorithm on the provided data object. Yields only values. If no object is provided the storage object in the builder will be used.
+ 
+| Param                  | Type                  | Description                      |                                                          
+| ---------------------- | --------------------- | ---------------------------------|
+| object                 | <code>Object</code>   | The object to recursively access |
+
+<a name="RecursionBuilder.prototype.paths"></a>
+## RecursionBuilder.prototype.paths(object) ⇒ <code>Iterable</code>
+Runs the recursion algorithm on the provided data object. Yields only paths. If no object is provided the storage object in the builder will be used.
+ 
+| Param                  | Type                  | Description                      |                                                          
+| ---------------------- | --------------------- | ---------------------------------|
+| object                 | <code>Object</code>   | The object to recursively access |
+
+<a name="RecursionBuilder.prototype.parents"></a>
+## RecursionBuilder.prototype.parents(object) ⇒ <code>Iterable</code>
+Runs the recursion algorithm on the provided data object. Yields only parents. If no object is provided the storage object in the builder will be used.
+ 
+| Param                  | Type                  | Description                      |                                                          
+| ---------------------- | --------------------- | ---------------------------------|
+| object                 | <code>Object</code>   | The object to recursively access |
 
 <a name="recurseExtract"></a>
-## recurseExtract(extractor, object) ⇒ <code>Iterator</code>
-Recurses a list of elements and calls the extractor method to get the next list to traverse.
-This can be faster than recursing the entire tree and filtering the results.
+## recurseExtract(extractor, object) ⇒ <code>RecursionBuilder</code>
+This method is a shorthand convience method for creating a builder object. This retains the same functionality
+as pre 2.x code.
  
 | Param     | Type                         | Description                                                                                                                     |                                                          
 | --------- | -----------------------------| ------------------------------------------------------|
 | extractor | <code>Function|String</code> | A function that returns the next item to iterate over |
 | items     | <code>Iterable</code>        | The list to recursively access                        |
 
-### Example
-```javascript
 
-let data = {
-  id: '1',
-  children: [{
-    id: 2,
-    children: [{
-      id: 4
-    }]
-  }, {
-    id: 3
-  }]
-}
-
-for (let value of recurseExtract(item => item.children, data)) {
-  //=> data
-  //=> data.children[0]
-  //=> data.children[0].children[0]
-  //=> data.children[1]
-}
-```
+<a name="recurseTree"></a>
+## recurseTree(object, yieldFilter, traverseFilter, entryExtractor) ⇒ <code>RecursionBuilder</code>
+This method is a shorthand convience method for creating a builder object. This retains the same functionality
+as pre 2.x code.
+ 
+| Param          | Type                  | Description                                                                                                                     |                                                          
+| -------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| object         | <code>Object</code>   | The object to recursively access                                                                                                |
+| yieldFilter    | <code>Function</code> | A function that determines whether a value is yielded                                                                           |
+| traverseFilter | <code>Function</code> | A function that determines whether a value is accessed with recursion                                                           |
+| entryExtractor | <code>Function</code> | A function that extracts the key/value pair from an object. Defaults to the `entries` method or own enumerable keys for objects |
