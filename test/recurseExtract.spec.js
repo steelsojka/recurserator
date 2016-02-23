@@ -25,7 +25,7 @@ describe('recurseExtract', () => {
   }
 
   it('should call iterate over the items', () => {
-    for (let item of recurseExtract(item => item.children, data)) {
+    for (let item of recurseExtract(item => item.children, data).values()) {
       results.push(item);
     }
 
@@ -33,7 +33,7 @@ describe('recurseExtract', () => {
   });
 
   it('should work with a spread', () => {
-    results = [...recurseExtract(item => item.children, data)];
+    results = [...recurseExtract(item => item.children, data).values()];
     verify();
   });
 });
