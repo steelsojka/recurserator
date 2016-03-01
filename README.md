@@ -163,7 +163,7 @@ Runs the recursion algorithm on the provided data object.
 | object                 | <code>Object</code>   | The object to recursively access |
 
 <a name="RecursionBuilder.prototype.keys"></a>
-## RecursionBuilder.prototype.key(object) ⇒ <code>Iterable</code>
+## RecursionBuilder.prototype.keys(object) ⇒ <code>Iterable</code>
 Runs the recursion algorithm on the provided data object. Yields only keys. If no object is provided the storage object in the builder will be used.
  
 | Param                  | Type                  | Description                      |                                                          
