@@ -9,7 +9,7 @@ type RecursionState<T, U> = {
 	entryExtractor: EntryExtractor<T, U>;
 };
 
-type RecursionResult<T, U> = [string, T, string, U];
+type RecursionResult<T, U> = [string, U, string, T];
 
 interface Entries {
 	<T, U, K>(object: T): Iterable<[K, U]>;
@@ -44,17 +44,22 @@ interface RecursionBuilderStatic {
 	createExtractor(target: any, name: string, index: number): void;
 }
 
-interface RecursionBuilder<T, U> {
-	[Symbol.iterator](): Iterable<RecursionResult<T, U>>;
-	recurse(): Iterable<RecursionResult<T, U>>;
-	recurse<R>(object: R, path?: string): Iterable<RecursionResult<R, U>>;
-	recurse<R, W>(object: R, path?: string): Iterable<RecursionResult<R, W>>;
+interface RecursionBuilder<T, U> implements Iterable {
+	[Symbol.iterator](): Iterator<RecursionResult<T, U>>;
+	recurse(): Iterator<RecursionResult<T, U>>;
+	recurse<R>(object: R, path?: string): Iterator<RecursionResult<R, U>>;
+	recurse<R, W>(object: R, path?: string): Iterator<RecursionResult<R, W>>;
 
 	yield(filter: YieldFilter<T, U>): RecursionBuilder<T, U>;
 	traverse(filter: TraverseFilter<T, U>): RecursionBuilder<T, U>;
 	entries(filter: EntryExtractor<T, U>): RecursionBuilder<T, U>;
 	extractor(filter: any): RecursionBuilder<T, U>;
 	clone(newState?: RecursionState<T, U>): RecursionBuilder<T, U>;
+	
+	values<T, U>(object?: T): Iterator<U>;
+	keys<T, U>(object?: T): Iterator<U>;
+	paths<T, U>(object?: T): Iterator<U>;
+	parents<T, U>(object?: T): Iterator<U>;
 }
 
 declare module "recurserator" {
