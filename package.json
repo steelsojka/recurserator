@@ -1,6 +1,6 @@
 {
   "name": "recurserator",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "description": "Handle object recursion like a boss",
   "scripts": {
     "lint": "eslint ./lib/**",
