@@ -71,18 +71,18 @@ declare module "recurserator" {
 	export default RecursionBuilderStatic;
 }
 
-declare module "recuserator/RecursionBuilder" {
+declare module "recurserator/RecursionBuilder" {
 	export default RecursionBuilderStatic;
 }
 
-declare module "recuserator/recurseTree" {
+declare module "recurserator/recurseTree" {
 	export default RecurseTree;
 }
 
-declare module "recuserator/recurseExtract" {
+declare module "recurserator/recurseExtract" {
 	export default RecurseExtract;
 }
 
-declare module "recuserator/utils/entries" {
+declare module "recurserator/utils/entries" {
 	export default Entries;
 }
