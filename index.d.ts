@@ -1,6 +1,7 @@
 type TraverseFilter<T, U> = (value: U, key: string, object: T) => boolean;
 type YieldFilter<T, U> = (value: U, key: string, object: T) => boolean;
 type EntryExtractor<T, U> = (object: T) => [string, U];
+type ChildExtractor<T, U> = string|[string, string]|{[key: string]: any}|((object: T) => U);
 
 type RecursionState<T, U> = {
 	traverseFilter: TraverseFilter<T, U>;
@@ -27,9 +28,9 @@ interface RecurseTree {
 }
 
 interface RecurseExtract {
-	<T, U>(extractor: EntryExtractor<T, U>, items: T|T[]): RecursionBuilder<T, U>;
-	<T>(extractor: EntryExtractor<T, any>, items: T|T[]): RecursionBuilder<T, any>;
-	(extractor: EntryExtractor<any, any>, items: any|any[]): RecursionBuilder<any, any>;
+	<T, U>(extractor: ChildExtractor<T, U>, items: T|T[]): RecursionBuilder<T, U>;
+	<T>(extractor: ChildExtractor<T, any>, items: T|T[]): RecursionBuilder<T, any>;
+	(extractor: ChildExtractor<any, any>, items: any|any[]): RecursionBuilder<any, any>;
 }
 
 interface RecursionBuilderStatic {
@@ -45,21 +46,21 @@ interface RecursionBuilderStatic {
 }
 
 interface RecursionBuilder<T, U> implements Iterable {
-	[Symbol.iterator](): Iterator<RecursionResult<T, U>>;
-	recurse(): Iterator<RecursionResult<T, U>>;
-	recurse<R>(object: R, path?: string): Iterator<RecursionResult<R, U>>;
-	recurse<R, W>(object: R, path?: string): Iterator<RecursionResult<R, W>>;
+	[Symbol.iterator](): IterableIterator<RecursionResult<T, U>>;
+	recurse(): IterableIterator<RecursionResult<T, U>>;
+	recurse<R>(object: R, path?: string): IterableIterator<RecursionResult<R, U>>;
+	recurse<R, W>(object: R, path?: string): IterableIterator<RecursionResult<R, W>>;
 
 	yield(filter: YieldFilter<T, U>): RecursionBuilder<T, U>;
 	traverse(filter: TraverseFilter<T, U>): RecursionBuilder<T, U>;
 	entries(filter: EntryExtractor<T, U>): RecursionBuilder<T, U>;
-	extractor(filter: any): RecursionBuilder<T, U>;
+	extractor(filter: ChildExtractor<T, U>): RecursionBuilder<T, U>;
 	clone(newState?: RecursionState<T, U>): RecursionBuilder<T, U>;
 	
-	values<T, U>(object?: T): Iterator<U>;
-	keys<T, U>(object?: T): Iterator<U>;
-	paths<T, U>(object?: T): Iterator<U>;
-	parents<T, U>(object?: T): Iterator<U>;
+	values<T, U>(object?: T): IterableIterator<U>;
+	keys<T, U>(object?: T): IterableIterator<U>;
+	paths<T, U>(object?: T): IterableIterator<U>;
+	parents<T, U>(object?: T): IterableIterator<U>;
 }
 
 declare module "recurserator" {
