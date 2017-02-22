@@ -64,7 +64,7 @@ const data = {
   }
 };
 
-const bulder = RecursionBuilder.create(data);
+const builder = RecursionBuilder.create(data);
 
 for (let [key, value, path, parent] of builder) {
   //=> ['value1', 10, 'value1', data]
