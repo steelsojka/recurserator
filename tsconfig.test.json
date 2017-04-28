@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "target": "es5",
+    "outDir": "./test",
+    "lib": [
+      "es2015"
+    ]
+  }
+}

@@ -3,13 +3,21 @@
   "version": "2.0.6",
   "description": "Handle object recursion like a boss",
   "scripts": {
-    "lint": "eslint ./lib/**",
-    "clean": "babel-node scripts/clean.js",
-    "build": "babel-node scripts/build.js",
+    "clean": "del dist",
+    "clean:test": "del test",
+    "prebuild:test": "npm run clean:test",
+    "build": "npm run build:es5 && npm run build:es2015",
+    "build:es5": "tsc -p tsconfig.es5.json",
+    "build:es2015": "tsc -p tsconfig.es2015.json",
+    "build:test": "tsc -p tsconfig.test.json",
     "prebuild": "npm run clean",
-    "test": "mocha --require test --compilers js:babel-register test/**/*.spec.js",
+    "pretest": "npm run build:test",
+    "posttest": "npm run clean:test",
+    "test": "mocha test/**/*.spec.js",
     "test:watch": "npm run test -- -w"
   },
+  "main": "./dist/es5/index.js",
+  "typings": "./dist/es5/index.d.ts",
   "author": "Steven Sojka (http://steelsojka.github.io)",
   "keywords": [
     "generators",
@@ -26,19 +34,14 @@
   },
   "license": "MIT",
   "dependencies": {
-    "lodash": "^4.6.1"
+    "tslib": "^1.6.1"
   },
   "devDependencies": {
-    "babel-cli": "^6.2.0",
-    "babel-core": "^6.2.1",
-    "babel-plugin-transform-es2015-modules-commonjs": "^6.2.0",
-    "babel-polyfill": "^6.3.14",
-    "babel-preset-es2015": "^6.1.18",
-    "babel-register": "^6.2.0",
+    "@types/chai": "^3.5.1",
+    "@types/mocha": "^2.2.41",
     "chai": "^3.4.1",
+    "del-cli": "^0.2.1",
     "mocha": "^2.3.4",
-    "shelljs": "^0.5.3",
-    "sinon": "^1.17.2",
-    "sinon-chai": "^2.8.0"
+    "typescript": "^2.3.1"
   }
 }

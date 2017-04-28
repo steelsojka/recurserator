@@ -1,7 +1,6 @@
 import { expect } from 'chai';
-import isObject from 'lodash.isobject';
 
-import RecursionBuilder from '../lib/RecursionBuilder';
+import { RecursionBuilder } from './RecursionBuilder';
 
 describe('RecursionBuilder', () => {
   let data, results;
@@ -22,11 +21,11 @@ describe('RecursionBuilder', () => {
     expect(results[0]).to.eql(['prop', data.prop, 'prop', data]);
     expect(results[1]).to.eql(['nested', data.prop.nested, 'prop.nested', data.prop]);
     expect(results[2]).to.eql(['test', data.test, 'test', data]);
-    expect(results[3]).to.eql([0, data.test[0], 'test[0]', data.test]);
+    expect(results[3]).to.eql(['0', data.test[0], 'test[0]', data.test]);
   }
 
   it('should call iterate over the items', () => {
-    for (let item of RecursionBuilder.create(data, { yield: isObject })) {
+    for (let item of RecursionBuilder.create(data)) {
       results.push(item);
     }
 
@@ -34,14 +33,14 @@ describe('RecursionBuilder', () => {
   });
 
   it('should work with a spread', () => {
-    results = [...RecursionBuilder.create(data, { yield: isObject })];
+    results = [...RecursionBuilder.create(data)];
     verify();
   });
 
   it('should extract keys', () => {
     results = [...RecursionBuilder.create(data).keys()];
 
-    expect(results).to.eql(['prop', 'nested', 'test', 0, 'bool']);
+    expect(results).to.eql(['prop', 'nested', 'test', '0', 'bool']);
   });
 
   it('should extract paths', () => {
@@ -54,5 +53,15 @@ describe('RecursionBuilder', () => {
     results = [...RecursionBuilder.create(data).values()];
 
     expect(results).to.eql([data.prop, data.prop.nested, data.test, data.test[0], data.bool]);
+  });
+
+  it('should set the yield fn', () => {
+    results = [
+      ...RecursionBuilder.create(data).yieldOn(v => typeof v === 'boolean')
+    ];
+
+    expect(results).to.eql([
+      [ 'bool', false, 'bool', data ]
+    ]);
   });
 });
