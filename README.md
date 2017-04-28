@@ -30,10 +30,10 @@ A RecursionBuilder instance itself is an iterable. RecursionBuilder objects are 
 | Param                  | Type                  | Description                                                                                                                     |                                                          
 | ---------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | object                 | <code>Object</code>   | The object to recursively access                                                                                                |
-| options.yieldFilter    | <code>Function</code> | A function that determines whether a value is yielded                                                                           |
-| options.traverseFilter | <code>Function</code> | A function that determines whether a value is accessed with recursion                                                           |
-| options.entryExtractor | <code>Function</code> | A function that extracts the key/value pair from an object. Defaults to the `entries` method or own enumerable keys for objects |
-| options.childExtractor | <code>Function</code> | A function that extracts the next item to iterate over                                                                          |
+| options.yieldOn    | <code>Function</code> | A function that determines whether a value is yielded                                                                           |
+| options.traverseOn | <code>Function</code> | A function that determines whether a value is accessed with recursion                                                           |
+| options.readEntry | <code>Function</code> | A function that extracts the key/value pair from an object. Defaults to the `entries` method or own enumerable keys for objects |
+| options.readNext | <code>Function</code> | A function that extracts the next item to iterate over                                                                          |
 
 ### Example
 
