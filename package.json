@@ -14,7 +14,8 @@
     "pretest": "npm run build:test",
     "posttest": "npm run clean:test",
     "test": "mocha test/**/*.spec.js",
-    "test:watch": "npm run test -- -w"
+    "test:watch": "npm run test -- -w",
+    "release": "standard-version"
   },
   "main": "./dist/es5/index.js",
   "typings": "./dist/es5/index.d.ts",
@@ -42,6 +43,7 @@
     "chai": "^3.4.1",
     "del-cli": "^0.2.1",
     "mocha": "^2.3.4",
+    "standard-version": "^4.0.0",
     "typescript": "^2.3.1"
   }
 }
