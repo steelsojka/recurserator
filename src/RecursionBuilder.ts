@@ -177,7 +177,7 @@ export class RecursionBuilder<K = string, V = any, O extends object = object> im
 
 function createChildExtractor<O>(fn: Function|string): (value: O) => O {
   return (value: any) => {
-    return typeof fn === 'string' ? isObject(value) ? value[fn] : undefined : fn(value);
+    return typeof fn === 'string' ? isObject(value) ? (value as any)[fn] : undefined : fn(value);
   };
 }
 
