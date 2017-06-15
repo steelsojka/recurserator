@@ -5,7 +5,8 @@
     "target": "es5",
     "outDir": "./test",
     "lib": [
-      "es2015"
+      "es2015",
+      "dom"
     ]
   }
 }

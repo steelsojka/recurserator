@@ -119,6 +119,7 @@ export class RecursionBuilder<K = string, V = any, O extends object = object> im
       yieldOn: this._yieldOn,
       traverseOn: this._traverseOn,
       readEntry: this._readEntry,
+      readNext: this._readNext,
       ...state
     });
   }

@@ -64,4 +64,24 @@ describe('RecursionBuilder', () => {
       [ 'bool', false, 'bool', data ]
     ]);
   });
+
+  describe('when extracting recursion keys', () => {
+    let data;
+
+    beforeEach(() => {
+      data = {
+        children: [{}, { children: [ {} ] }]
+      }      
+    });  
+
+    it('should recurse all the items', () => {
+      const builder = RecursionBuilder.create([ data ])  
+        .readNext('children')
+        .traverseOn(i => typeof i === 'object');
+
+      const result = [ ...builder.values() ];
+
+      expect(result.length).to.equal(4)
+    });
+  });
 });
