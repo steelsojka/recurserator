@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.0.4"></a>
+## [3.0.4](https://github.com/steelsojka/recurserator/compare/v3.0.2...v3.0.4) (2017-06-15)
+
+
+### Bug Fixes
+
+* **RecursionBuilder:** check for safe object on child extractor ([db84222](https://github.com/steelsojka/recurserator/commit/db84222))
+* **RecursionBuilder:** when using readNext don't use value if falsey ([a3793f4](https://github.com/steelsojka/recurserator/commit/a3793f4))
+
+
+
 <a name="3.0.3"></a>
 ## [3.0.3](https://github.com/steelsojka/recurserator/compare/v3.0.2...v3.0.3) (2017-06-15)
 
