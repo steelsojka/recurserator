@@ -1,6 +1,6 @@
 {
   "name": "recurserator",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "Handle object recursion like a boss",
   "scripts": {
     "clean": "del dist",
