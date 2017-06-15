@@ -91,17 +91,15 @@ export class RecursionBuilder<K = string, V = any, O extends object = object> im
 
     for (const [ key, value ] of this._readEntry(object)) {
       const path = resolvePath(_path, key, object);
-      let child;
+      let nextValue: any = value;
 
       if (this._yieldOn(value, key, object as O)) {
         yield [ key, value as V, path, object as O];
       }
 
       if (this._readNext) {
-        child = this._readNext(value);
+        nextValue = this._readNext(value);
       }
-
-      const nextValue = (child || value) as any;
 
       if (this._traverseOn(nextValue, key, object)) {
         yield* this.recurse(nextValue, path);
