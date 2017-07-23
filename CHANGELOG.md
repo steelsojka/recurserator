@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.1.0"></a>
+# [4.1.0](https://github.com/steelsojka/recurserator/compare/v4.0.0...v4.1.0) (2017-07-23)
+
+
+### Features
+
+* **RecursionBuilder:** make extract method public ([284aec8](https://github.com/steelsojka/recurserator/commit/284aec8))
+
+
+
 <a name="4.0.0"></a>
 # [4.0.0](https://github.com/steelsojka/recurserator/compare/v3.0.4...v4.0.0) (2017-07-23)
 
