@@ -7,6 +7,8 @@ export interface RecursionBuilderState<K, V, O extends object> {
   readNext?(object: V|O): V|O;
 }
 
+export type ExtractedProperty<K, V, O extends object> = K | V | O | string | RecursionBuilder<K, V, O>;
+
 const isObject = (v: any): v is object => typeof v === 'object' && v != null;
 
 /**
@@ -119,7 +121,7 @@ export class RecursionBuilder<K = string, V = any, O extends object = object> im
    * @returns {IterableIterator<V>} 
    */
   * values(object?: O): IterableIterator<V> {
-    yield* this.extract('value', object) as IterableIterator<V>;
+    yield* this.extract<V>('value', object);
   }
 
   /**
@@ -128,7 +130,7 @@ export class RecursionBuilder<K = string, V = any, O extends object = object> im
    * @returns {IterableIterator<K>} 
    */
   * keys(object?: O): IterableIterator<K> {
-    yield* this.extract('key', object) as IterableIterator<K>;
+    yield* this.extract<K>('key', object);
   }
 
   /**
@@ -137,7 +139,7 @@ export class RecursionBuilder<K = string, V = any, O extends object = object> im
    * @returns {IterableIterator<string>} 
    */
   * paths(object?: O): IterableIterator<string> {
-    yield* this.extract('path', object) as IterableIterator<string>;
+    yield* this.extract<string>('path', object);
   }
 
   /**
@@ -146,12 +148,12 @@ export class RecursionBuilder<K = string, V = any, O extends object = object> im
    * @returns {IterableIterator<string>} 
    */
   * parents(object?: O): IterableIterator<O> {
-    yield* this.extract('parent', object) as IterableIterator<O>;
+    yield* this.extract<O>('parent', object);
   }
 
-  * extract(key: keyof RecursionResult<K, V, O>, object?: O): IterableIterator<K|V|O|string> {
+  * extract<T extends ExtractedProperty<K, V, O>>(key: keyof RecursionResult<K, V, O>, object?: O): IterableIterator<T> {
     for (const results of this.recurse(object || this._object)) {
-      yield (results as any)[key];
+      yield results[key] as T;
     }
   }
 
@@ -204,12 +206,12 @@ function resolvePath<K, O extends object>(path: string|undefined, key: K, value:
   return path ? Array.isArray(value) ? `${path}[${key}]` : `${path}.${key}` : key.toString();
 }
 
-function* objectEntryReader<K, V, O>(object: O): Iterable<[ K, V ]> {
-  if (typeof (object as any)['entries'] === 'function') {
-    yield* (object as any)['entries']();
+function* objectEntryReader<K, V, O>(object: O & { [key: string]: any }): Iterable<[ K, V ]> {
+  if (typeof object.entries === 'function') {
+    yield* object.entries();
   } else {
     for (const key of Object.keys(object)) {
-      yield [ key as any, (object as any)[ key ]];
+      yield [ key as any, object[ key ]];
     }
   }
 }
