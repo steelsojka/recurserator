@@ -119,7 +119,7 @@ export class RecursionBuilder<K = string, V = any, O extends object = object> im
    * @returns {IterableIterator<V>} 
    */
   * values(object?: O): IterableIterator<V> {
-    yield* this._extractProp(object, 'value') as IterableIterator<V>;
+    yield* this.extract('value', object) as IterableIterator<V>;
   }
 
   /**
@@ -128,7 +128,7 @@ export class RecursionBuilder<K = string, V = any, O extends object = object> im
    * @returns {IterableIterator<K>} 
    */
   * keys(object?: O): IterableIterator<K> {
-    yield* this._extractProp(object, 'key') as IterableIterator<K>;
+    yield* this.extract('key', object) as IterableIterator<K>;
   }
 
   /**
@@ -137,7 +137,7 @@ export class RecursionBuilder<K = string, V = any, O extends object = object> im
    * @returns {IterableIterator<string>} 
    */
   * paths(object?: O): IterableIterator<string> {
-    yield* this._extractProp(object, 'path') as IterableIterator<string>;
+    yield* this.extract('path', object) as IterableIterator<string>;
   }
 
   /**
@@ -146,10 +146,10 @@ export class RecursionBuilder<K = string, V = any, O extends object = object> im
    * @returns {IterableIterator<string>} 
    */
   * parents(object?: O): IterableIterator<O> {
-    yield* this._extractProp(object, 'parents') as IterableIterator<O>;
+    yield* this.extract('parent', object) as IterableIterator<O>;
   }
 
-  private * _extractProp(object: O|undefined, key: string): IterableIterator<K|V|O|string> {
+  * extract(key: keyof RecursionResult<K, V, O>, object?: O): IterableIterator<K|V|O|string> {
     for (const results of this.recurse(object || this._object)) {
       yield (results as any)[key];
     }
