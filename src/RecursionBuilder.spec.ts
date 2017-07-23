@@ -17,11 +17,46 @@ describe('RecursionBuilder', () => {
     results = [];
   });
 
+  function assertObject(actual: any, expected: any): void {
+    expect(actual.key).to.equal(expected.key);
+    expect(actual.value).to.equal(expected.value);
+    expect(actual.path).to.equal(expected.path);
+    expect(actual.parent).to.equal(expected.parent);
+    expect(actual.previous).to.equal(expected.previous);
+  }
+
   function verify() {
-    expect(results[0]).to.eql(['prop', data.prop, 'prop', data]);
-    expect(results[1]).to.eql(['nested', data.prop.nested, 'prop.nested', data.prop]);
-    expect(results[2]).to.eql(['test', data.test, 'test', data]);
-    expect(results[3]).to.eql([0, data.test[0], 'test[0]', data.test]);
+    assertObject(results[0], {
+      key: 'prop',
+      value: data.prop,
+      path: 'prop',
+      parent: data,
+      previous: null
+    });
+
+    assertObject(results[1], {
+      key: 'nested',
+      value: data.prop.nested,
+      path: 'prop.nested',
+      parent: data.prop,
+      previous: results[0]
+    });
+
+    assertObject(results[2], {
+      key: 'test',
+      value: data.test,
+      path: 'test',
+      parent: data,
+      previous: null
+    });
+
+    assertObject(results[3], {
+      key: 0,
+      value: data.test[0],
+      path: 'test[0]',
+      parent: data.test,
+      previous: results[2]
+    });
   }
 
   it('should call iterate over the items', () => {
@@ -60,9 +95,13 @@ describe('RecursionBuilder', () => {
       ...RecursionBuilder.create(data).yieldOn(v => typeof v === 'boolean')
     ];
 
-    expect(results).to.eql([
-      [ 'bool', false, 'bool', data ]
-    ]);
+    assertObject(results[0], {
+      key: 'bool',
+      value: false,
+      path: 'bool',
+      parent: data,
+      previous: null
+    });
   });
 
   describe('when extracting recursion keys', () => {
@@ -82,6 +121,26 @@ describe('RecursionBuilder', () => {
       const result = [ ...builder.values() ];
 
       expect(result.length).to.equal(4)
+    });
+  });
+
+  describe('when yielding the last result', () => {
+    it('should yield the correct previous value', () => {
+      const builder = RecursionBuilder.create({
+        test: {
+          skipped: {
+            blorg: true
+          }
+        }
+      })
+        .yieldOn((value, key) => key !== 'skipped');
+
+      const results = [ ...builder ];
+
+      expect(results.length).to.equal(2);
+      expect(results[0].previous).to.be.null;
+      expect(results[1].key).to.equal('blorg');
+      expect(results[1].previous).to.equal(results[0]);
     });
   });
 });

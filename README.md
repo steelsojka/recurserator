@@ -53,7 +53,7 @@ const data = {
 
 const builder = RecursionBuilder.create(data);
 
-for (let [key, value, path, parent] of builder) {
+for (let { key, value, path, parent } of builder) {
   //=> ['value1', 10, 'value1', data]
   //=> ['aList', [...], 'aList', data]
   //=> ['0', {...}, 'aList[0]', data.aList]
@@ -67,7 +67,7 @@ for (let [key, value, path, parent] of builder) {
 const truth = () => true;
 const notArray = item => !Array.isArray(item);
 
-for (let [key, value, path, parent] of builder.yieldOn(truth).traverseOn(notArray)) {
+for (let { key, value, path, parent } of builder.yieldOn(truth).traverseOn(notArray)) {
   //=> ['value1', 10, 'value1', data]
   //=> ['aList', [...], 'aList', data]
   //=> ['nested', {...}, 'nested', data]
@@ -76,7 +76,7 @@ for (let [key, value, path, parent] of builder.yieldOn(truth).traverseOn(notArra
 
 // Only yield objects
 
-for (let [key, value, path, parent] of builder.yieldOn(isObject)) {
+for (let { key, value, path, parent } of builder.yieldOn(isObject)) {
   //=> ['aList', [...], 'aList', data]
   //=> ['0', {...}, 'aList[0]', data.aList]
   //=> ['nested', {...}, 'nested', data]

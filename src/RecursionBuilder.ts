@@ -1,3 +1,5 @@
+import { RecursionResult } from './RecursionResult';
+
 export interface RecursionBuilderState<K, V, O extends object> {
   yieldOn?(value: V, key: K, object: O): boolean;
   traverseOn?(value: V, key: K, object: O): boolean;
@@ -16,7 +18,7 @@ const isObject = (v: any): v is object => typeof v === 'object' && v != null;
  * @template V The type of the value.
  * @template O The type of the data object.
  */
-export class RecursionBuilder<K = string, V = any, O extends object = object> implements Iterable<[ K, V, string, O ]> {
+export class RecursionBuilder<K = string, V = any, O extends object = object> implements Iterable<RecursionResult<K, V, O>> {
   private _yieldOn: (value: V, key: K, object: O) => boolean;
   private _traverseOn: (value: V, key: K, object: O) => boolean;
   private _readEntry: (object: O) => Iterable<[ K, V ]>;
@@ -84,27 +86,12 @@ export class RecursionBuilder<K = string, V = any, O extends object = object> im
    * @param {string} [_path] 
    * @returns {IterableIterator<[ K, V, string, O ]>} 
    */
-  * recurse(object?: O, _path?: string): IterableIterator<[ K, V, string, O ]> {
+  * recurse(object?: O): IterableIterator<RecursionResult<K, V, O>> {
     if (!object) {
       return;
     }
 
-    for (const [ key, value ] of this._readEntry(object)) {
-      const path = resolvePath(_path, key, object);
-      let nextValue: any = value;
-
-      if (this._yieldOn(value, key, object as O)) {
-        yield [ key, value as V, path, object as O];
-      }
-
-      if (this._readNext) {
-        nextValue = this._readNext(value);
-      }
-
-      if (this._traverseOn(nextValue, key, object)) {
-        yield* this.recurse(nextValue, path);
-      }
-    }
+    yield* this._recurse(object);
   }
 
   /**
@@ -122,7 +109,7 @@ export class RecursionBuilder<K = string, V = any, O extends object = object> im
     });
   }
 
-  * [Symbol.iterator](): IterableIterator<[ K, V, string, O]> {
+  * [Symbol.iterator](): IterableIterator<RecursionResult<K, V, O>> {
     yield* this.recurse(this._object);
   }
 
@@ -132,7 +119,7 @@ export class RecursionBuilder<K = string, V = any, O extends object = object> im
    * @returns {IterableIterator<V>} 
    */
   * values(object?: O): IterableIterator<V> {
-    yield* this._extractPropAtIndex(object, 1) as IterableIterator<V>;
+    yield* this._extractProp(object, 'value') as IterableIterator<V>;
   }
 
   /**
@@ -141,7 +128,7 @@ export class RecursionBuilder<K = string, V = any, O extends object = object> im
    * @returns {IterableIterator<K>} 
    */
   * keys(object?: O): IterableIterator<K> {
-    yield* this._extractPropAtIndex(object, 0) as IterableIterator<K>;
+    yield* this._extractProp(object, 'key') as IterableIterator<K>;
   }
 
   /**
@@ -150,7 +137,7 @@ export class RecursionBuilder<K = string, V = any, O extends object = object> im
    * @returns {IterableIterator<string>} 
    */
   * paths(object?: O): IterableIterator<string> {
-    yield* this._extractPropAtIndex(object, 2) as IterableIterator<string>;
+    yield* this._extractProp(object, 'path') as IterableIterator<string>;
   }
 
   /**
@@ -159,12 +146,46 @@ export class RecursionBuilder<K = string, V = any, O extends object = object> im
    * @returns {IterableIterator<string>} 
    */
   * parents(object?: O): IterableIterator<O> {
-    yield* this._extractPropAtIndex(object, 3) as IterableIterator<O>;
+    yield* this._extractProp(object, 'parents') as IterableIterator<O>;
   }
 
-  private * _extractPropAtIndex(object: O|undefined, index: number): IterableIterator<K|V|O|string> {
+  private * _extractProp(object: O|undefined, key: string): IterableIterator<K|V|O|string> {
     for (const results of this.recurse(object || this._object)) {
-      yield results[index];
+      yield (results as any)[key];
+    }
+  }
+
+  /**
+   * Recurses the data object using the configured recursion algorithm.
+   * @param {O} [object] 
+   * @param {string} [_path] 
+   * @returns {IterableIterator<[ K, V, string, O ]>} 
+   */
+  private * _recurse(object: O, _path?: string, lastResult?: RecursionResult<K, V, O>): IterableIterator<RecursionResult<K, V, O>> {
+    for (const [ key, value ] of this._readEntry(object)) {
+      const path = resolvePath(_path, key, object);
+      let nextValue: any = value;
+      let result: RecursionResult<K, V, O> | undefined = lastResult ? lastResult : undefined;
+
+      if (this._yieldOn(value, key, object as O)) {
+        result = new RecursionResult<K, V, O>(
+          value as V, 
+          key, 
+          path,
+          object as O,
+          lastResult ? lastResult : null
+        );
+
+        yield result;
+      }
+
+      if (this._readNext) {
+        nextValue = this._readNext(value);
+      }
+
+      if (this._traverseOn(nextValue, key, object)) {
+        yield* this._recurse(nextValue, path, result);
+      }
     }
   }
 
@@ -183,12 +204,12 @@ function resolvePath<K, O extends object>(path: string|undefined, key: K, value:
   return path ? Array.isArray(value) ? `${path}[${key}]` : `${path}.${key}` : key.toString();
 }
 
-function* objectEntryReader<K, V>(object: { [ key: string ]: any }): IterableIterator<[ K, V ]> {
-  if (typeof object.entries === 'function') {
-    yield* object.entries();
+function* objectEntryReader<K, V, O>(object: O): Iterable<[ K, V ]> {
+  if (typeof (object as any)['entries'] === 'function') {
+    yield* (object as any)['entries']();
   } else {
     for (const key of Object.keys(object)) {
-      yield [ key as any, object[ key ]];
+      yield [ key as any, (object as any)[ key ]];
     }
   }
 }
