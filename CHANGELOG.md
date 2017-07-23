@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.0.0"></a>
+# [4.0.0](https://github.com/steelsojka/recurserator/compare/v3.0.4...v4.0.0) (2017-07-23)
+
+
+### Code Refactoring
+
+* **results:** enhanced result object ([5fd84ae](https://github.com/steelsojka/recurserator/commit/5fd84ae))
+
+
+### BREAKING CHANGES
+
+* **results:** The result object now returns an object over an array for extensibility.
+
+
+
 <a name="3.0.4"></a>
 ## [3.0.4](https://github.com/steelsojka/recurserator/compare/v3.0.2...v3.0.4) (2017-06-15)
 
