@@ -110,7 +110,7 @@ Returns a new RecursionBuilder instance.
  
 | Param     | Type                         | Description                                           |                                                          
 | --------- | ---------------------------- | ----------------------------------------------------- |
-| readNext | <code>Function|String</code> | A function that returns the next item to iterate over |
+| readNext | <code>Function|string</code> | A function that returns the next item to iterate over |
 
 <a name="RecursionBuilder.prototype.readEntry"></a>
 ## RecursionBuilder.prototype.readEntry(fn) ⇒ <code>RecursionBuilder</code>
@@ -179,4 +179,13 @@ Runs the recursion algorithm on the provided data object. Yields only parents. I
  
 | Param                  | Type                  | Description                      |                                                          
 | ---------------------- | --------------------- | ---------------------------------|
+| object                 | <code>Object</code>   | The object to recursively access |
+
+<a name="RecursionBuilder.prototype.extract"></a>
+## RecursionBuilder.prototype.extract(key, object?) ⇒ <code>Iterable</code>
+Runs the recursion algorithm on the provided data object. Yields the key from the RecursionResult object. If no object is provided the storage object in the builder will be used.
+ 
+| Param                  | Type                  | Description                      |                                                          
+| ---------------------- | --------------------- | ---------------------------------|
+| key                    | <code>string</code>   | The key to extract from the result object |
 | object                 | <code>Object</code>   | The object to recursively access |
